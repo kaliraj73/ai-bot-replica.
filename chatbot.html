@@ -1,0 +1,38 @@
+<div id="chatbot-container" style="max-width:400px;margin:auto;border:1px solid #ccc;padding:10px;border-radius:8px;">
+  <h3 style="text-align:center;">🤖 AI Chat Bot</h3>
+  <div id="chatbox" style="height:300px;overflow-y:auto;border:1px solid #ddd;padding:5px;margin-bottom:10px;font-family:sans-serif;"></div>
+  
+  <input id="userInput" type="text" placeholder="Type your message..." style="width:80%;padding:5px;">
+  <button onclick="sendMessage()" style="width:18%;padding:5px;">Send</button>
+</div>
+
+<script>
+const backendURL = "https://your-service.onrender.com/ask"; // Change after deployment
+
+async function sendMessage() {
+    const inputField = document.getElementById("userInput");
+    const message = inputField.value.trim();
+    if (!message) return;
+
+    appendMessage("You", message);
+    inputField.value = "";
+
+    try {
+        const response = await fetch(backendURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: message })
+        });
+        const data = await response.json();
+        appendMessage("Bot", data.reply || "Error: No reply");
+    } catch (err) {
+        appendMessage("Bot", "❌ Error: " + err.message);
+    }
+}
+
+function appendMessage(sender, text) {
+    const chatbox = document.getElementById("chatbox");
+    chatbox.innerHTML += `<p><strong>${sender}:</strong> ${text}</p>`;
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
+</script>
